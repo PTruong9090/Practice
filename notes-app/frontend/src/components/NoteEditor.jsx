@@ -21,19 +21,19 @@ export default function NoteEditor({mode, initialTitle, initialBody, onSave, onC
             onSubmit={handleSubmit}
         >
             <input
-                className="w-full bg-transparent text-3xl font-bold"
+                className="w-full bg-transparent text-3xl font-bold p-2 outline-none"
                 placeholder="Untitled"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
             />
             <textarea
-                className='mt-6 flex-1 resize-none text-lg bg-transparent outline-none'
+                className='mt-6 flex-1 resize-none text-lg bg-transparent outline-none p-2'
                 placeholder='Start writing'
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
             />
 
-            <div className="mt-4 flex outline-none gap-2">
+            <div className="mt-4 flex justify-end outline-none gap-2 p-2 border-t">
                 <button
                     type='button'
                     className="rounded-md border px-4 py-2"
