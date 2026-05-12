@@ -21,7 +21,7 @@ async function seedDatabase() {
     } catch (error) {
         console.error("Failed to seed ", error)
     } finally {
-        sequelize.close()
+        await sequelize.close()
     }
 }
 
