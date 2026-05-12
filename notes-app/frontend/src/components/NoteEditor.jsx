@@ -21,7 +21,7 @@ export default function NoteEditor({mode, initialTitle, initialBody, onSave, onC
             onSubmit={handleSubmit}
         >
             <input
-                className="w-full bg-transparent text-3xl font-bold p-2 outline-none"
+                className="w-full border-b bg-transparent text-3xl font-bold p-2 outline-none"
                 placeholder="Untitled"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}

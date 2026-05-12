@@ -1,4 +1,4 @@
-import { getNotes, editNote, createNote } from '../controllers/note.controller.js'
+import { getNotes, editNote, createNote, deleteNote } from '../controllers/note.controller.js'
 import express from 'express'
 
 const router = express.Router()
@@ -9,6 +9,7 @@ router.route('/')
 
 router.route(`/:id`)
     .put(editNote)
+    .delete(deleteNote)
 
 
 export default router

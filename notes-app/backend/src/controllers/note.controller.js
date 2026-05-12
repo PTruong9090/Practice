@@ -88,3 +88,28 @@ export const editNote = async (req, res) => {
         })
     }
 }
+
+export const deleteNote = async (req, res) => {
+    try {
+        const note = await Note.findByPk(req.params.id)
+
+        if (!note) {
+            return res.json(404).json({
+                success: false,
+                message: 'Note not found'
+            })
+        }
+
+        await note.destroy()
+
+        return res.json(204).send()
+
+    } catch (error) {
+        console.error(error.message)
+
+        return res.json(500).json({
+            success: false,
+            message: 'Internal server error'
+        })
+    }
+}

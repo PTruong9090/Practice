@@ -20,3 +20,9 @@ export function updateNote(id, note) {
         body: JSON.stringify(note),
     })
 }
+
+export function deleteNote(id) {
+    return request(`notes/${id}`, {
+        method: 'DELETE',
+    })
+}
