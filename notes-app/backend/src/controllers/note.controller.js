@@ -11,6 +11,13 @@ export const createNote = async (req, res) => {
             })
         }
 
+        if (!body || body.trim() === '') {
+            return res.status(400).json({
+                success: false,
+                message: 'Missing body'
+            })
+        }
+
         const note = await Note.create({
             title: title.trim(),
             body: body,
@@ -25,7 +32,7 @@ export const createNote = async (req, res) => {
     } catch (error) {
         console.error('Create note error', error)
         return res.status(500).json({
-            status: 'Error',
+            success: false,
             message: 'Server error while creating note'
         })
     }
@@ -38,7 +45,7 @@ export const getNotes = async (req, res) => {
         })
 
         return res.status(200).json({
-            status: 'Success',
+            success: true,
             data: note
         })
 
@@ -50,6 +57,34 @@ export const getNotes = async (req, res) => {
             message: 'Internal server error',
         })
     }
+}
+
+export const getNote = async (req, res) => {
+    try {
+        const id = req.params.id
+
+        const note = await Note.findByPk(id)
+
+        if (!note) {
+            return res.status(404).json({
+                success: false,
+                message: 'Note not found in database'
+            })
+        }
+
+        return res.status(200).json({
+            success: true,
+            data: note
+        })
+
+    } catch (error) {
+        console.error(error.message)
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        })
+    }
+    
 }
 
 export const editNote = async (req, res) => {
@@ -94,7 +129,7 @@ export const deleteNote = async (req, res) => {
         const note = await Note.findByPk(req.params.id)
 
         if (!note) {
-            return res.json(404).json({
+            return res.status(404).json({
                 success: false,
                 message: 'Note not found'
             })
@@ -102,12 +137,12 @@ export const deleteNote = async (req, res) => {
 
         await note.destroy()
 
-        return res.json(204).send()
+        return res.status(204).send()
 
     } catch (error) {
         console.error(error.message)
 
-        return res.json(500).json({
+        return res.status(500).json({
             success: false,
             message: 'Internal server error'
         })

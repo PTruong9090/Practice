@@ -8,8 +8,8 @@ export default function NotesPage() {
     const [notes, setNotes] = useState([])
     const [selectedNoteId, setSelectedNoteId] = useState(null)
     const [isCreating, setIsCreating] = useState(false)
-    const [isMenuOpen, setIsMenuOpen] = useState(false)
-
+    const [isLoading, setIsLoading] = useState(false)
+ 
     const selectedNote = notes.find((note) => note.id === selectedNoteId)
 
     async function handleCreateNote(data) {
@@ -28,6 +28,7 @@ export default function NotesPage() {
     async function handleDelete(id) {
         try {
             await deleteNote(id)
+            setSelectedNoteId(null)
             await loadNotes()
         } catch (error) {
             console.error(error.message)
@@ -46,11 +47,14 @@ export default function NotesPage() {
 
     async function loadNotes() {
         try {
+            setIsLoading(true)
             const res = await getNotes()
             
             setNotes(res.data)
         } catch (error){
             console.error(error.message)
+        } finally {
+            setIsLoading(false)
         }
     }
 
@@ -80,6 +84,14 @@ export default function NotesPage() {
                             </option>
                         ))}
                     </select>
+                    {selectedNoteId && !isCreating ? (
+                        <button 
+                            onClick={() => {handleDelete(selectedNote.id)}}
+                            className="rounded-md px-2 bg-black text-white hover:bg-gray-500"
+                        >
+                            X
+                        </button>
+                    ) : null }
                     <button 
                         onClick={() => {
                             setSelectedNoteId(null)
@@ -105,17 +117,19 @@ export default function NotesPage() {
 
                 <section className='flex flex-1 flex-col gap-2 max-h-64 md:max-h-none overflow-y-auto p-3'>
                     {/* Insert Note Component */}
-                    {notes.map((note) => (
-                        <NoteCard 
-                            key={note.id}
-                            note={note}
-                            isSelected={note.id === selectedNoteId}
-                            onDelete={() => handleDelete(note.id)}
-                            onSelect={() => {
-                                setSelectedNoteId(note.id);
-                                setIsCreating(false);
+                    {isLoading ? (
+                        <p>Loading notes...</p>
+                    ) : (notes.map((note) => (
+                            <NoteCard 
+                                key={note.id}
+                                note={note}
+                                isSelected={note.id === selectedNoteId}
+                                onDelete={() => handleDelete(note.id)}
+                                onSelect={() => {
+                                    setSelectedNoteId(note.id);
+                                    setIsCreating(false);
                             }}/>
-                    ))}
+                    )))}
                 </section>
             </aside>
 
