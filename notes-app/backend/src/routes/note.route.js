@@ -1,4 +1,4 @@
-import { getNotes, editNote, createNote } from '../controllers/note.controller'
+import { getNotes, editNote, createNote } from '../controllers/note.controller.js'
 import express from 'express'
 
 const router = express.Router()

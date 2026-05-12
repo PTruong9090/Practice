@@ -11,7 +11,7 @@ export default function NotesPage() {
     const [selectedNoteId, setSelectedNoteId] = useState(null)
     const [isCreating, setIsCreating] = useState(false)
 
-    const selectedNote = notes.find((note) => notes.id === selectedNoteId)
+    const selectedNote = notes.find((note) => note.id === selectedNoteId)
 
     async function handleCreateNote(data) {
         try {
@@ -39,8 +39,8 @@ export default function NotesPage() {
     async function loadNotes() {
         try {
             const res = await getNotes()
-
-            setNote(res.data)
+            
+            setNotes(res.data)
         } catch (error){
             console.error(error.message)
         }
@@ -63,14 +63,17 @@ export default function NotesPage() {
                         className='rounded-md px-3 py-2 hover:bg-gray-500 text-small text-white bg-black'>New</button>
                 </header>
 
-                <section className='flex-1 flex-row overflow-y-auto p-3'>
+                <section className='flex flex-1 flex-col gap-2 overflow-y-auto p-3'>
                     {/* Insert Note Component */}
                     {notes.map((note) => (
                         <NoteCard 
                             key={note.id}
                             note={note}
                             isSelected={note.id === selectedNoteId}
-                            onSelect={() => setSelectedNoteId(note.id)}/>
+                            onSelect={() => {
+                                setSelectedNoteId(note.id);
+                                setIsCreating(false);
+                            }}/>
                     ))}
                 </section>
             </aside>
@@ -87,10 +90,12 @@ export default function NotesPage() {
                     />
                 ) : selectedNote ? (
                     <NoteEditor 
+                        key={selectedNote.id}
                         mode='Edit'
                         initialTitle={selectedNote.title}
                         initialBody={selectedNote.body}
                         onSave={(data) => handleUpdateNote(selectedNote.id, data)}
+                        onCancel={() => setSelectedNoteId(null)}
                     />
                 ) : (
                     <EmptyState/>

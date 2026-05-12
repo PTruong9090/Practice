@@ -3,13 +3,13 @@ import { useState } from "react";
 
 
 export default function NoteEditor({mode, initialTitle, initialBody, onSave, onCancel}) {
-    const [title, setTitle] = useState('')
-    const [body, setBody] = useState('')
+    const [title, setTitle] = useState(initialTitle)
+    const [body, setBody] = useState(initialBody)
 
     async function handleSubmit(e) {
         e.preventDefault()
 
-        onSave({
+        await onSave({
             title,
             body,
         })
