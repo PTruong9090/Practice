@@ -6,7 +6,7 @@ export const createNote = async (req, res) => {
         
         if (!title) {
             return res.status(400).json({
-                status: 'Error',
+                success: false,
                 message: 'Missing title'
             })
         }
@@ -16,14 +16,15 @@ export const createNote = async (req, res) => {
             body: body,
         })
 
-        res.status(201).json({
-            status: 'Success',
+        return res.status(201).json({
+            success: false,
             message: 'Note created sucessfully',
-            note
+            data: note
         })
+
     } catch (error) {
         console.error('Create note error', error)
-        res.status(500).json({
+        return res.status(500).json({
             status: 'Error',
             message: 'Server error while creating note'
         })
@@ -33,15 +34,57 @@ export const createNote = async (req, res) => {
 export const getNotes = async (req, res) => {
     try {
         const note = await Note.findAll()
+
         res.status(200).json({
             status: 'Success',
-            note
+            data: note
         })
-    } catch {
 
+    } catch (error) {
+        console.error('Error getting notes: ', error)
+
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+        })
     }
 }
 
 export const editNote = async (req, res) => {
+    try {
+        const {id, title, body} = req.body
 
+        const note = await Note.findByPk(id)
+
+        if (!note) {
+            return res.status(404).json({
+                success: false,
+                message: 'Note does not exist in database'
+            })
+        }
+
+        if (title === null || title === undefined || !title.trim()) {
+            return res.status(400).json({
+                success: false,
+                message: 'Title must be provided.'
+            })
+        }
+
+        await note.update({
+            title,
+            body
+        })
+
+        return res.status(204).json({
+            success: true
+        })
+
+    } catch (error) {
+        console.error(error.message)
+
+        return res.status(500).json({
+            success: false,
+            message: 'Server error'
+        })
+    }
 }
