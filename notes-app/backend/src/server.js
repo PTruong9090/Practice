@@ -2,14 +2,16 @@ import express from "express"
 import cors from "cors"
 import dotenv from "dotenv"
 import { sequelize } from "./db/sequelize.js"
+import noteRouter from './routes/note.route.js'
 
 const app = express()
 
-const PORT = process.env.DB_PORT || 3000
+const PORT = process.env.PORT || 3000
 console.log(PORT)
 
 app.use(cors())
 app.use(express.json())
+app.use('/api/notes', noteRouter)
 
 app.get('/health', (req, res) => {
     res.json({ ok: true })
