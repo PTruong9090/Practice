@@ -1,0 +1,35 @@
+import express from 'express'
+import cors from 'cors'
+import dotenv from 'dotenv'
+import { sequelize } from '../../../notes-app/backend/src/db/sequelize'
+
+const app = express()
+
+const PORT = process.env.PORT || 3000
+
+app.use(cors())
+app.use(express.json())
+
+app.use('/health', (req, res) => {
+    return res.json({ok: true})
+})
+
+async function startServer() {
+    try {
+        await sequelize.authenticate()
+        console.log('Connection has been successfully established')
+
+        await sequelize.sync()
+        console.log('Database synced')
+
+        app.listen(PORT, () => {
+            console.log(`Server listening on ${PORT}`)
+        })
+    } catch (error) {
+        console.error(error)
+    }
+}
+
+
+startServer()
+

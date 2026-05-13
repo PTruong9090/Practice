@@ -7,7 +7,6 @@ import noteRouter from './routes/note.route.js'
 const app = express()
 
 const PORT = process.env.PORT || 3000
-console.log(PORT)
 
 app.use(cors())
 app.use(express.json())
