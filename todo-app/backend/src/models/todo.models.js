@@ -1,7 +1,7 @@
-import { DataTypes } from 'Sequelize'
-import { sequelize } from "../db/sequelize";
+import { DataTypes } from "sequelize";
+import { sequelize } from "../db/sequelize.js";
 
-const Todo = sequelize.define(
+export const Todo = sequelize.define(
     "Todo", 
     {
         id: {
@@ -10,7 +10,7 @@ const Todo = sequelize.define(
             primaryKey: true
         },
 
-        tite: {
+        title: {
             type: DataTypes.STRING,
             allowNull: false,
         },
@@ -33,18 +33,20 @@ const Todo = sequelize.define(
         },
 
         dueDate: {
-            type: DateTypes.DATE,
+            type: DataTypes.DATE,
             allowNull: true,
         },
 
         createdAt: {
-            type: DataTypes.DATE.now(),
-            allowNull: true
+            type: DataTypes.DATE,
+            allowNull: true,
+            defaultValue: DataTypes.NOW,
         },
 
         updatedAt: {
-            type: DataTypes.DATE.now(),
-            allowNull: true
+            type: DataTypes.DATE,
+            allowNull: true,
+            defaultValue: DataTypes.NOW
         },
     }
 )

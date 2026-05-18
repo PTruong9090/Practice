@@ -1,7 +1,8 @@
 import express from 'express'
 import cors from 'cors'
-import dotenv from 'dotenv'
-import { sequelize } from '../../../notes-app/backend/src/db/sequelize'
+import { sequelize } from './db/sequelize.js'
+import { errorHandler } from './middlewares/middlewares.js'
+import todoRouter from './routes/todo.routes.js'
 
 const app = express()
 
@@ -13,6 +14,9 @@ app.use(express.json())
 app.use('/health', (req, res) => {
     return res.json({ok: true})
 })
+
+app.use('/api/todo', todoRouter)
+app.use(errorHandler)
 
 async function startServer() {
     try {
