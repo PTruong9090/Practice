@@ -1,103 +1,141 @@
-import { useState } from 'react'
-
+import { useState, useEffect } from 'react'
+import { getTodoList, createTodo, deleteTodo, editTodo, toggleTodo, getTodo } from '../api/api.js'
+import CreateForm from '../components/createForm'
+import TodoCard from '../components/todoCard.jsx'
 
 export default function TodoPage() {
+    const [loadingTodoList, setLoadingTodoList] = useState(false)
+
     const [todos, setTodos] = useState([])
     const [isCreating, setIsCreating] = useState(false)
-    const [title, setTitle] = useState('')
-    const [description, setDescription] = useState('')
-    const [completed, setCompleted] = useState(false)
     const [filter, setFilter] = useState('all')
 
-    async function handleCreateTodo() {
+    const filteredTodos = 
+        filter === 'all' ?
+            todos :
+            filter === 'active' ?
+                todos.filter((todo) => todo.completed === false) :
+                    todos.filter((todo) => todo.completed === true)
 
+    async function handleSubmit(data) {
+        try {
+            
+            const res = await createTodo(data)
+            await loadTodoList()
+
+        } catch (error) {
+            console.error(error)
+        } finally {
+            
+            setIsCreating(false)
+        }
     }
+
+    async function loadTodoList() {
+        try {
+            setLoadingTodoList(true)
+            const res = await getTodoList()
+            setTodos(res.data)
+
+        } catch (error) {
+            console.error(error)
+        } finally {
+            setLoadingTodoList(false)
+        }
+    }
+
+    async function handleDelete(id) {
+        try {
+            await deleteTodo(id)
+            await loadTodoList()
+
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    async function handleEdit(id, updatedData) {
+        try {
+            await editTodo(id, updatedData)
+            await loadTodoList()
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    async function handleToggle(id, completed) {
+        try {
+            await toggleTodo(id, completed)
+            await loadTodoList()
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    useEffect(() => {
+        loadTodoList()
+    }, [])
 
     return (
         <main className="flex min-h-screen p-8 bg-gray-50">
-            <div className="flex flex-col mx-auto text-center gap-4 border rounded-md p-5">
+            <div className="flex flex-col w-full max-w-md mx-auto text-center gap-4 border rounded-md p-5">
                 <h1 className="text-2xl font-bold border-b">Todo List</h1>
 
                 {isCreating ? (
-                    <form className='flex flex-col gap-3'>
-                        <input
-                            className='border rounded-md border-gray-500 p-1'
-                            placeholder='Add a title'
-                            onChange={(e) => setTitle(e.target.value)}
-                        >
-                        </input>
-                        <textarea
-                            className='border rounded-md px-1 border-gray-500'
-                            placeholder='Add a description'
-                            onChange={(e) => setDescription(e.target.value)}
-                        >
-                        </textarea>
-
-                        <div className='flex px-2 gap-2'>
-                            <select value={filter} onChange={(e) => setFilter(e.target.value)}>
-                                <option value='all'>All</option>
-                                <option value='active'>Active</option>
-                                <option value='completed'>Completed</option>
-                            </select>
-                            <input type='date'>
-                            </input>
-                        </div>
-
-                        <div className='flex gap-1 justify-end'>
-                            <button 
-                                onClick={() => {
-                                    setDescription('')
-                                    setIsCreating(false)
-                                    setTitle('')
-                                }}
-                                className='border px-4 hover:bg-gray-500 bg-black text-white rounded-md'
-                            >
-                                X
-                            </button>
-                            <button 
-
-                                className='border px-4 hover:bg-gray-500 bg-black text-white rounded-md'
-                            >
-                                ✓
-                            </button>
-                        </div>
-
-                    </form>
+                    <CreateForm
+                        onSave={handleSubmit}
+                        onCancel={() => setIsCreating(false)}
+                    />
                 ) : (
                     <button
+                        className='border bg-black text-white rounded-md mx-5 border-gray-300 hover:bg-gray-600 font-semibold'
                         onClick={() => setIsCreating(true)}
                     >
-                    Add a task
+                    Add a Task
                     </button>
                 )}
 
-                <div className='flex'>
+                <div className='flex w-full rounded-md border border-gray-300 overflow-hidden'>
                     <button 
                         onClick={() => setFilter('all')}
-                        className='px-4 hover:bg-gray-200'
+                        className={`flex-1 px-3 text-sm border-gray-300
+                            ${filter === 'all' ? 'bg-black text-white' : 'bg-white text-black hover:bg-gray-200'}
+                            `}
                     >
                         All
                     </button>
-                    |
+            
                     <button 
                         onClick={() => setFilter('active')}
-                        className='px-4 hover:bg-gray-200'
+                        className={`flex-1 px-3 text-sm border-gray-300 border-l
+                            ${filter === 'active' ? 'bg-black text-white' : 'bg-white text-black hover:bg-gray-200 '}`}
                     >
                         Active
                     </button>
-                    |
+                
                     <button 
                         onClick={() => setFilter('completed')}
-                        className='px-4 hover:bg-gray-200'>
+                        className={`flex-1 px-3 text-sm border-gray-300
+                            ${filter === 'completed' ? 'bg-black text-white' : 'bg-white text-black hover:bg-gray-200 '}`}>
                         Completed
                     </button>
                 </div>
 
-                <div className='flex flex-1 border'>
-                    {todos.map((todo) => {
-
-                    })
-                    }
+                <div className='flex flex-1 flex-col border rounded-md'>
+                    {!loadingTodoList ? (filteredTodos.map((todo) => (
+                        filteredTodos.length > 0 ? (
+                            <TodoCard 
+                                key={todo.id}
+                                todo={todo}
+                                onDelete={() => handleDelete(todo.id)}
+                                onEdit={(updatedData) => handleEdit(todo.id, updatedData)}
+                                onToggle={(completed) => handleToggle(todo.id, completed)}
+                            />
+                        ) : (
+                            <>No tasks available</>
+                    )))) : (
+                        <>Loading todo list...</>
+                    )}
                 </div>
 
             </div>

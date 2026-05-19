@@ -4,14 +4,15 @@ export function normalizeBaseUrl(url) {
     return url.replace(/\/+$/, '')
 }
 
-export async function request(path, options = {}) {
+export async function request(path, options={}) {
+    const normalizedURL = normalizeBaseUrl(API_BASE_URL) 
     const normalizedPath = path.startsWith('/') ? path : `/${path}`
 
-    const res = await fetch(`${normalizeBaseUrl(API_BASE_URL)}/api${normalizedPath}`, {
+    const res = await fetch(`${normalizedURL}/api${normalizedPath}`, {
         ...options,
         headers: {
-            "Content-Type": "application/json",
-            ...(options.headers || {}),
+            'Content-Type': 'application/json',
+            ...(options.headers || {})
         }
     })
 
@@ -22,9 +23,8 @@ export async function request(path, options = {}) {
     }
 
     if (!res.ok) {
-        throw new Error(data?.message || "Request failed.")
+        throw new Error(data?.message || 'Request failed')
     }
 
     return data
-    
 }

@@ -1,24 +1,26 @@
-import { useState } from "react";
+import { useState } from "react"
 
-export default function CreateForm({ onCancel, onSave }) {
-    const [title, setTitle] = useState('')
-    const [description, setDescription] = useState('')
-    const [completed, setCompleted] = useState(false)
-    const [dueDate, setDueDate] = useState(new Date().toISOString().split('T')[0])
-    const [priority, setPriority] = useState('medium')
-
+export default function EditForm({ todo, onCancel, onSave }) {
+    
+    const [initialTitle, setInitialTitle] = useState(todo.title)
+    const [initialDescription, setInitialDescription] = useState(todo.description)
+    const [initalCompleted, setInitialCompleted] = useState(todo.completed)
+    const [initialDueDate, setInitialDueDate] = useState(
+        todo.dueDate ? todo.dueDate.split('T')[0] : '')
+    const [initialPriority, setInitialPriority] = useState(todo.priority)
     const [isSaving, setIsSaving] = useState(false)
 
     async function handleSubmit(e) {
         e.preventDefault()
-        try {    
+        
+        try {
             setIsSaving(true)
-            await onSave ({
-                title,
-                description,
-                completed,
-                priority,
-                dueDate,
+            await onSave({
+                title: initialTitle,
+                description: initialDescription,
+                completed: initalCompleted,
+                dueDate: initialDueDate,
+                priority: initialPriority,
             })
         } catch (error) {
             setIsSaving(false)
@@ -27,39 +29,42 @@ export default function CreateForm({ onCancel, onSave }) {
             setIsSaving(false)
         }
     }
-
+ 
     return (
-        <form className='flex flex-col w-full gap-3' onSubmit={handleSubmit}>
+        <form className='flex flex-col w-full gap-3 p-4' onSubmit={handleSubmit}>
             <input
                 className='border rounded-md border-gray-500 p-1'
                 placeholder='Add a title'
-                onChange={(e) => setTitle(e.target.value)}
+                value={initialTitle}
+                onChange={(e) => setInitialTitle(e.target.value)}
             >
             </input>
             <textarea
                 className='border rounded-md px-1 border-gray-500'
                 placeholder='Add a description'
-                onChange={(e) => setDescription(e.target.value)}
+                value={initialDescription}
+                onChange={(e) => setInitialDescription(e.target.value)}
             >
             </textarea>
 
             <div className='flex md: px-2 gap-4 justify-center text-sm'>
-                <select value={completed} onChange={(e) => setCompleted(e.target.value === 'true')}>
-                    <option value={false}>Active</option>
-                    <option value={true}>Completed</option>
+                <select value={String(initalCompleted)} onChange={(e) => setInitialCompleted(e.target.value === 'true')}>
+                    <option value={'false'}>Active</option>
+                    <option value={'true'}>Completed</option>
                 </select>
-                <select value={priority} onChange={(e) => setPriority(e.target.value)}>
+                <select value={initialPriority} onChange={(e) => setInitialPriority(e.target.value)}>
                     <option value={'low'}>Low</option>
                     <option value={'medium'}>Medium</option>
                     <option value={'high'}>High</option>
                 </select>
-                <input type='date' value={dueDate} onChange={(e) => setDueDate(e.target.value)}>
+                <input type='date' value={initialDueDate} onChange={(e) => setInitialDueDate(e.target.value)}>
                     
                 </input>
             </div>
 
             <div className='flex gap-1 justify-end'>
                 <button 
+                    disabled={isSaving}
                     type='button'
                     onClick={() => onCancel()}
                     className='border px-4 hover:bg-gray-500 bg-black text-white rounded-md'
