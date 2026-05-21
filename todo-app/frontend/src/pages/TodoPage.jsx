@@ -123,7 +123,7 @@ export default function TodoPage() {
 
                 <div className='flex flex-1 flex-col border rounded-md'>
                     {!loadingTodoList ? (filteredTodos.map((todo) => (
-                        filteredTodos.length > 0 ? (
+                        filteredTodos ? (
                             <TodoCard 
                                 key={todo.id}
                                 todo={todo}
